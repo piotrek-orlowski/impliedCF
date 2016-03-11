@@ -34,7 +34,7 @@ impliedDivergencesWrapper <- function(options, pow.vec, t.vec, types, filtering.
   }
   
   if(!is.null(cl)){
-    clusterExport(cl,c("pow.vec","t.vec","types","U","L"))
+    clusterExport(cl,c("pow.vec","t.vec","types","U","L"), envir = environment())
     clusterEvalQ(cl, ut.mat <- expand.grid(u=pow.vec, t=t.vec,type = types))
     
     div.pr.db <- parLapplyLB(cl = cl, X = option.panels, fun = function(opts){
