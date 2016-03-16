@@ -15,6 +15,5 @@ Depends:
     quadprog,
     quantreg,
     NMOF,
-    rgl,
     fields,
     compiler
