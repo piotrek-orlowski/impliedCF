@@ -38,7 +38,7 @@ impliedDivergencesWrapper <- function(options, pow.vec, t.vec, types, filtering.
     clusterEvalQ(cl, ut.mat <- expand.grid(u=pow.vec, t=t.vec,type = types))
     
     div.pr.db <- parLapplyLB(cl = cl, X = option.panels, fun = function(opts){
-      res <- tryCatch(expr = tpsImpliedDivergence(option.panels = opts$opt.pn, mkt.frame = opts$mkt, u.t.mat = ut.mat, verbose = F, time.IV = T, L = L, U = U),
+      res <- tryCatch(expr = tpsImpliedDivergence(option.panels = opts$opt.pn, mkt.frame = opts$mkt, u.t.mat = ut.mat, verbose = F, time.IV = T, L = L, U = U, gam.bs = gam.bs, gam.m= gam.m),
                       error = function(e){
                         print(e)
                         return(data.frame(u=NA_real_, t = NA_real_, type = NA_character_, res = NA_real_, stringsAsFactors = F))
