@@ -88,7 +88,29 @@ panelSmoother <- function(option.panels, mkt.frame, gam.bs = 'ds', gam.m = c(1,0
     return(c(put,call))
   }
   
+  otmFunCov <- function(models,k,r,q,dT,coeffVec){
+    logF <- (r-q)*dT
+    kvec <- ((k-logF)/sqrt(dT)^1)
+    kvec <- kvec
+    
+    # Create prediction data matrix to be used with the models -- remember that they were fit to de-meaned data.
+    pred.mat <- data.frame(k=kvec,dT=dT)
+    if(inherits(models,"gam")){
+      IV.pred <- predict.gam(object = models, newdata = pred.mat, type = "lpmatrix")
+      IV.pred <- IV.pred %*% coeffVec
+      IV.pred <- pmax(IV.pred, 1e-2)
+      IV.pred <- IV.pred^2
+    } else {
+      IV.pred <- pmax(1e-4, models(pred.mat[,"k"]))^2
+    }
+    b <- -exp(k - r*dT) + exp(-q*dT)
+    
+    put <- apply(IV.pred,2,function(v.vec) vanillaOptionEuropean(S=1,X=exp(k[kvec<=0]),tau=dT,r=r,q=q,v=v.vec[kvec<=0],greeks=FALSE,type="put"))
+    call <- apply(IV.pred,2,function(v.vec) vanillaOptionEuropean(S=1,X=exp(k[kvec>0]),tau=dT,r=r,q=q,v=v.vec[kvec>0],greeks=FALSE,type="call"))
+    
+    return(rbind(put,call))
+  }
   
-  return(list(model = tps.fit, regr.mat = regr.mat, otmFun = otmFun))
+  return(list(model = tps.fit, regr.mat = regr.mat, otmFun = otmFun, otmFunCov = otmFunCov))
   
 }
