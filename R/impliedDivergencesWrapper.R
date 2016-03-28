@@ -66,7 +66,7 @@ impliedDivergencesWrapper <- function(options, pow.vec, t.vec, types, filtering.
   library(abind)
   div.bSamples <- lapply(div.pr.db,function(x) x$bSample)
   div.bSamples <- do.call(function(...) abind(...,along = 3), div.bSamples)
-  div.pr.db <- lapply(dov.pr.db, function(x) x$iDiv)
+  div.pr.db <- lapply(div.pr.db, function(x) x$iDiv)
   div.pr.db <- rbind_all(div.pr.db)
   return(list(div.pr.db = div.pr.db, div.bSamples = div.bSamples))
 }
