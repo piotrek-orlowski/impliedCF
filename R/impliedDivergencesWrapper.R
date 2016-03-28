@@ -10,9 +10,11 @@
 #' @param L lower integration limit for pricing in terms of log-strike. L < 0
 #' @param gam.bs bs argument to \code{\link[mgcv]{s}}
 #' @param gam.m m argument to \code{\link[mgcv]{s}}
+#' @param bootstrap boolean argument to \code{\link{tpsImpliedDivergence}}
+#' @param Nrepl integer argument to \code{\link{tpsImpliedDivergence}}
 #' @export
 
-impliedDivergencesWrapper <- function(options, pow.vec, t.vec, types, filtering.expression, cl = cl, U = NULL, L = NULL, gam.bs = "ds", gam.m = c(1,0.5)){
+impliedDivergencesWrapper <- function(options, pow.vec, t.vec, types, filtering.expression, cl = cl, U = NULL, L = NULL, gam.bs = "ds", gam.m = c(1,0.5), bootstrap = F, Nrepl = 1e3){
   
   ut.mat <- expand.grid(u=pow.vec, t=t.vec,type = types)
   
@@ -44,22 +46,27 @@ impliedDivergencesWrapper <- function(options, pow.vec, t.vec, types, filtering.
                         return(data.frame(u=NA_real_, t = NA_real_, type = NA_character_, res = NA_real_, stringsAsFactors = F))
                       }
       )
-      res <- cbind(day = opts$day, res)
-      return(res)
+      res.db <- cbind(day = opts$day, res$iDiv)
+      res.bSample <- res$bSample
+      return(list(iDiv = res.db, bSample= res.bSample))
     })
   } else {
     div.pr.db <- lapply(X = option.panels, FUN = function(opts){
-      res <- tryCatch(expr = tpsImpliedDivergence(option.panels = opts$opt.pn, mkt.frame = opts$mkt, u.t.mat = ut.mat, verbose = F, time.IV = T, L = L, U = U,  gam.bs = gam.bs, gam.m = gam.m),
+      res <- tryCatch(expr = tpsImpliedDivergence(option.panels = opts$opt.pn, mkt.frame = opts$mkt, u.t.mat = ut.mat, verbose = F, time.IV = T, L = L, U = U,  gam.bs = gam.bs, gam.m = gam.m, bootstrap = bootstrap, Nrepl = Nrepl),
                       error = function(e){
                         print(e)
                         return(data.frame(u=NA_real_, t = NA_real_, type = NA_character_, res = NA_real_, stringsAsFactors = F))
                       }
       )
-      res <- cbind(day = opts$day, res)
-      return(res)
+      res.db <- cbind(day = opts$day, res$iDiv)
+      res.bSample <- res$bSample
+      return(list(iDiv = res.db, bSample= res.bSample))
     })
   }
-  
+  library(abind)
+  div.bSamples <- lapply(div.pr.db,function(x) x$bSample)
+  div.bSamples <- do.call(function(...) abind(...,along = 3), div.bSamples)
+  div.pr.db <- lapply(dov.pr.db, function(x) x$iDiv)
   div.pr.db <- rbind_all(div.pr.db)
-  return(div.pr.db)
+  return(list(div.pr.db = div.pr.db, div.bSamples = div.bSamples))
 }
