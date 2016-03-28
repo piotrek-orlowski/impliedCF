@@ -11,9 +11,10 @@ License: What license is it under?
 Depends:
     cubature,
     robustbase,
-    mgcv,
+    scam,
     quadprog,
     quantreg,
     NMOF,
     fields,
-    compiler
+    compiler,
+    statmod
