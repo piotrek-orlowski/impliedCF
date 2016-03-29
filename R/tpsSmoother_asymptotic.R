@@ -3,7 +3,8 @@ panelSmoother_asymptotic <- function(option.panels, mkt.frame, gam.bs = 'ds', ga
   
   # function for rescaling IV for asymtptotic behaviour
   # asFoo <- function(x,t,tr) {x <- x/sqrt(t);(abs(x) <= tr) *(  log(1+tr)  ) +(abs(x) > tr) * log(1+abs(x))}
-  asFoo <- function(x,t) {x <- x/sqrt(t);(abs(x) <= 0.3) *(  log(1+0.3)  ) +(abs(x) > 0.3) * log(1+abs(x))}
+  # asFoo <- function(x,t) {x <- x/sqrt(t);(abs(x) <= 0.3) *(  log(1+0.3)  ) +(abs(x) > 0.3) * log(1+abs(x))}
+  asFoo <- function(x,t) log(2+abs(x))
   # create regression frame from list of option panels
   regr.mat <- NULL
   opt.mat <- NULL
