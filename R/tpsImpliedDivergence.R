@@ -14,7 +14,7 @@
 tpsImpliedDivergence <- function(option.panels,mkt.frame,u.t.mat, doPlot=FALSE, doFitPlot = 0, verbose=FALSE, L = NULL, U = NULL, bootstrap = F, Nrepl = 1e3, ...) {
   
   # Fit model (with k=1)
-  smoothing.results <- panelSmoother(option.panels, mkt.frame, ...) 
+  smoothing.results <- panelSmoother_asymptotic(option.panels, mkt.frame, ...) 
   tps.fit <- smoothing.results$model
   regr.mat <- smoothing.results$regr.mat
   otmFun <- cmpfun(smoothing.results$otmFun)
