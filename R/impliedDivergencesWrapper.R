@@ -36,11 +36,11 @@ impliedDivergencesWrapper <- function(options, pow.vec, t.vec, types, filtering.
   }
   
   if(!is.null(cl)){
-    clusterExport(cl,c("pow.vec","t.vec","types","U","L","gam.bs","gam.m"), envir = environment())
+    clusterExport(cl,c("pow.vec","t.vec","types","U","L","gam.bs","gam.m","bootstrap","Nrepl"), envir = environment())
     clusterEvalQ(cl, ut.mat <- expand.grid(u=pow.vec, t=t.vec,type = types))
     
     div.pr.db <- parLapply(cl, option.panels, function(opts){
-      res <- tryCatch(expr = tpsImpliedDivergence(option.panels = opts$opt.pn, mkt.frame = opts$mkt, u.t.mat = ut.mat, verbose = F, time.IV = T, L = L, U = U,gam.bs=gam.bs,gam.m=gam.m),
+      res <- tryCatch(expr = tpsImpliedDivergence(option.panels = opts$opt.pn, mkt.frame = opts$mkt, u.t.mat = ut.mat, L = L, U = U,gam.bs=gam.bs,gam.m=gam.m, bootstrap = bootstrap, Nrepl = Nrepl),
                       error = function(e){
                         print(e)
                         return(data.frame(u=NA_real_, t = NA_real_, type = NA_character_, res = NA_real_, stringsAsFactors = F))
@@ -52,7 +52,7 @@ impliedDivergencesWrapper <- function(options, pow.vec, t.vec, types, filtering.
     })
   } else {
     div.pr.db <- lapply(X = option.panels, FUN = function(opts){
-      res <- tryCatch(expr = tpsImpliedDivergence(option.panels = opts$opt.pn, mkt.frame = opts$mkt, u.t.mat = ut.mat, verbose = F, time.IV = T, L = L, U = U,  gam.bs = gam.bs, gam.m = gam.m, bootstrap = bootstrap, Nrepl = Nrepl),
+      res <- tryCatch(expr = tpsImpliedDivergence(option.panels = opts$opt.pn, mkt.frame = opts$mkt, u.t.mat = ut.mat, L = L, U = U,  gam.bs = gam.bs, gam.m = gam.m, bootstrap = bootstrap, Nrepl = Nrepl),
                       error = function(e){
                         print(e)
                         return(data.frame(u=NA_real_, t = NA_real_, type = NA_character_, res = NA_real_, stringsAsFactors = F))
