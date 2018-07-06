@@ -18,3 +18,4 @@ Depends:
     fields,
     compiler,
     statmod
+RoxygenNote: 6.0.1
