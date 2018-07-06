@@ -12,10 +12,12 @@
 #' @param ... further arguments to be passed to \code{\link{panelSmoother}} and further to \code{\link{rgl::persp3d}}
 #' @export
 #' @return An Nx3 dataframe, where the last column is the calculated transform value
-tpsImpliedCF <- function(option.panels,mkt.frame,u.t.mat, discounted = TRUE, doPlot=FALSE, doFitPlot = 0, verbose=FALSE, ...) {
+tpsImpliedCF <- function(option.panels, mkt.frame, u.t.mat, discounted = TRUE, smoothing.results = NULL, doPlot=FALSE, doFitPlot = 0, verbose=FALSE, ...) {
   
   # Fit model (with k=1)
-  smoothing.results <- panelSmoother(option.panels, mkt.frame, ...)
+  if(is.null(smoothing.results)){
+    smoothing.results <- panelSmoother(option.panels, mkt.frame, ...) 
+  }
   tps.fit <- smoothing.results$model
   regr.mat <- smoothing.results$regr.mat
   otmFun <- cmpfun(smoothing.results$otmFun)
@@ -59,11 +61,11 @@ tpsImpliedCF <- function(option.panels,mkt.frame,u.t.mat, discounted = TRUE, doP
     
   #   try({u.t.out[nn,3] <- cos(u*(r-q)*t) + 1i*sin(u*(r-q)*t);
   #   u.t.out[nn,3] <- u.t.out[nn,3] + 
-  #     integrate(function(k) otmFun(tps.fit,k=k,r=r,q=q,dT=t) * (-u^2*cos(u*k)+u*sin(u*k))/exp(k) * exp(r*t),lower=logF,upper=U,subdivisions = 20000L, rel.tol = 1e-6)$value + 
-  #     1i*integrate(function(k) otmFun(tps.fit,k=k,r=r,q=q,dT=t) * (-u^2*sin(u*k)-u*cos(u*k))/exp(k) * exp(r*t),lower=logF,upper=U,subdivisions = 20000L, rel.tol = 1e-6)$value
+  #     integrate(function(k) otmFun(tps.fit,k=k,r=r,q=q,dT=t) * (-u^2*cos(u*k)+u*sin(u*k))/exp(k) * exp(r*t),lower=logF,upper=U,subdivisions = 20000L, rel.tol = 1e-8)$value + 
+  #     1i*integrate(function(k) otmFun(tps.fit,k=k,r=r,q=q,dT=t) * (-u^2*sin(u*k)-u*cos(u*k))/exp(k) * exp(r*t),lower=logF,upper=U,subdivisions = 20000L, rel.tol = 1e-8)$value
   #   u.t.out[nn,3] <- u.t.out[nn,3] + 
-  #     integrate(function(k) otmFun(tps.fit,k=k,r=r,q=q,dT=t) * (-u^2*cos(u*k)+u*sin(u*k))/exp(k) * exp(r*t),lower=L,upper=logF,subdivisions = 20000L, rel.tol = 1e-6)$value + 
-  #     1i*integrate(function(k) otmFun(tps.fit,k=k,r=r,q=q,dT=t) * (-u^2*sin(u*k)-u*cos(u*k))/exp(k) * exp(r*t),lower=L,upper=logF,subdivisions = 20000L, rel.tol = 1e-6)$value})
+  #     integrate(function(k) otmFun(tps.fit,k=k,r=r,q=q,dT=t) * (-u^2*cos(u*k)+u*sin(u*k))/exp(k) * exp(r*t),lower=L,upper=logF,subdivisions = 20000L, rel.tol = 1e-8)$value + 
+  #     1i*integrate(function(k) otmFun(tps.fit,k=k,r=r,q=q,dT=t) * (-u^2*sin(u*k)-u*cos(u*k))/exp(k) * exp(r*t),lower=L,upper=logF,subdivisions = 20000L, rel.tol = 1e-8)$value})
   #   u.t.out[nn,3] <- u.t.out[nn,3] * exp(- u*(r-q)*t*1i)
   # }
     try({u.t.out[nn,3] <- cos(u*(r-q)*t) + 1i*sin(u*(r-q)*t);
