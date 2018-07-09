@@ -70,11 +70,11 @@ tpsImpliedCF <- function(option.panels, mkt.frame, u.t.mat, discounted = TRUE, s
   # }
     try({u.t.out[nn,3] <- cos(u*(r-q)*t) + 1i*sin(u*(r-q)*t);
       u.t.out[nn,3] <- u.t.out[nn,3] + 
-        pcubature(function(k) otmFun(tps.fit,k=k,r=r,q=q,dT=t) * (-u^2*cos(u*k)+u*sin(u*k))/exp(k) * exp(r*t),lowerLimit = logF,upperLimit = U, tol = 1e-6)$integral + 
-        1i*pcubature(function(k) otmFun(tps.fit,k=k,r=r,q=q,dT=t) * (-u^2*sin(u*k)-u*cos(u*k))/exp(k) * exp(r*t),lowerLimit = logF,upperLimit = U,tol = 1e-6)$integral
+        pcubature(function(k) otmFun(tps.fit,k=k,r=r,q=q,dT=t) * (-u^2*cos(u*k)+u*sin(u*k))/exp(k) * exp(r*t),lowerLimit = logF,upperLimit = U, tol = 1e-4, vectorInterface = TRUE)$integral + 
+        1i*pcubature(function(k) otmFun(tps.fit,k=k,r=r,q=q,dT=t) * (-u^2*sin(u*k)-u*cos(u*k))/exp(k) * exp(r*t),lowerLimit = logF,upperLimit = U,tol = 1e-4, vectorInterface = TRUE)$integral
       u.t.out[nn,3] <- u.t.out[nn,3] + 
-        pcubature(function(k) otmFun(tps.fit,k=k,r=r,q=q,dT=t) * (-u^2*cos(u*k)+u*sin(u*k))/exp(k) * exp(r*t),lowerLimit = L,upperLimit = logF, tol = 1e-6)$integral + 
-        1i*pcubature(function(k) otmFun(tps.fit,k=k,r=r,q=q,dT=t) * (-u^2*sin(u*k)-u*cos(u*k))/exp(k) * exp(r*t),lowerLimit = L,upperLimit = logF, tol = 1e-6)$integral})
+        pcubature(function(k) otmFun(tps.fit,k=k,r=r,q=q,dT=t) * (-u^2*cos(u*k)+u*sin(u*k))/exp(k) * exp(r*t),lowerLimit = L,upperLimit = logF, tol = 1e-4, vectorInterface = TRUE)$integral + 
+        1i*pcubature(function(k) otmFun(tps.fit,k=k,r=r,q=q,dT=t) * (-u^2*sin(u*k)-u*cos(u*k))/exp(k) * exp(r*t),lowerLimit = L,upperLimit = logF, tol = 1e-4, vectorInterface = TRUE)$integral})
       u.t.out[nn,3] <- u.t.out[nn,3] * ifelse(discounted,exp(- u*(r-q)*t*1i),1)
   }
   return(u.t.out)
