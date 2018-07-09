@@ -69,6 +69,8 @@ panelSmoother <- function(option.panels, mkt.frame, gam.bs = 'ds', gam.m = c(1,0
   
   
   otmFun <- function(models,k,r,q,dT){
+    dim_k <- dim(k)
+    k <- as.numeric(k)
     logF <- (r-q)*dT
     kvec <- ((k-logF)/sqrt(dT)^1)
     kvec <- kvec
@@ -85,7 +87,13 @@ panelSmoother <- function(option.panels, mkt.frame, gam.bs = 'ds', gam.m = c(1,0
     put <- vanillaOptionEuropean(S=1,X=exp(k[kvec<=0]),tau=dT,r=r,q=q,v=IV.pred[kvec<=0],greeks=FALSE,type="put")
     call <- vanillaOptionEuropean(S=1,X=exp(k[kvec>0]),tau=dT,r=r,q=q,v=IV.pred[kvec>0],greeks=FALSE,type="call")
     
-    return(c(put,call))
+    if(is.null(dim_k)){
+      res <- c(put,call)  
+    } else {
+      res <- matrix(c(put,call), nrow = dim_k[1], ncol = dim_k[2])
+    }
+    
+    return(res)
   }
   
   otmFunCov <- function(models,k,r,q,dT,coeffVec){
