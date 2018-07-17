@@ -11,10 +11,13 @@
 #' @param ... further arguments to be passed to \code{\link{panelSmoother}} and further to \code{\link{rgl::persp3d}}
 #' @export
 #' @return An Nx3 dataframe, where the last column is the calculated transform value
-tpsImpliedGFT <- function(option.panels,mkt.frame,u.t.mat, doPlot=FALSE, doFitPlot = 0, verbose=FALSE, ...) {
+tpsImpliedGFT <- function(option.panels, mkt.frame, u.t.mat, discounted = TRUE, smoothing.results = NULL, doPlot=FALSE, doFitPlot = 0, verbose=FALSE, ...) {
   
   # Fit model (with k=1)
-  smoothing.results <- panelSmoother(option.panels, mkt.frame, ...)
+  # Fit model (with k=1)
+  if(is.null(smoothing.results)){
+    smoothing.results <- panelSmoother(option.panels, mkt.frame, ...) 
+  }
   tps.fit <- smoothing.results$model
   regr.mat <- smoothing.results$regr.mat
   otmFun <- cmpfun(smoothing.results$otmFun)
@@ -57,9 +60,9 @@ tpsImpliedGFT <- function(option.panels,mkt.frame,u.t.mat, doPlot=FALSE, doFitPl
       logF <- (r-q)*t
       
       try({u.t.out[nn,3] <- exp(u*(r-q)*t);
-            u.t.out[nn,3] <- u.t.out[nn,3]+integrate(function(k) otmFun(tps.fit,k=k,r=r,q=q,dT=t) * u * (u-1) * exp((u-1)*k) * exp(r*t),lower=logF,upper=U,subdivisions = 1000L, rel.tol = 1e-6)$value
-            u.t.out[nn,3] <- u.t.out[nn,3]+integrate(function(k) otmFun(tps.fit,k=k,r=r,q=q,dT=t) * u * (u-1) * exp((u-1)*k) * exp(r*t),lower=L,upper=logF,subdivisions = 1000L, rel.tol = 1e-6)$value})
-           u.t.out[nn,3] <- u.t.out[nn,3] * exp(- u * (r-q)*t)
+            u.t.out[nn,3] <- u.t.out[nn,3]+hcubature(function(k) otmFun(tps.fit,k=k,r=r,q=q,dT=t) * u * (u-1) * exp((u-1)*k) * exp(r*t),lowerLimit = logF, upperLimit = U, tol = 1e-5, vectorInterface = TRUE)$integral
+            u.t.out[nn,3] <- u.t.out[nn,3]+hcubature(function(k) otmFun(tps.fit,k=k,r=r,q=q,dT=t) * u * (u-1) * exp((u-1)*k) * exp(r*t),lowerLimit = L, upperLimit = logF, tol = 1e-5, vectorInterface = TRUE)$integral})
+           u.t.out[nn,3] <- u.t.out[nn,3] * ifelse(discounted,exp(- u * (r-q)*t),1)
   }
   return(u.t.out)
 }
